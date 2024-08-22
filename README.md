@@ -17,7 +17,7 @@ For the most part, this is a series of wrappers which utilize common Pentesting 
 Argus also performs a few extra tricks, so I can impress users with its elegance.
 
 ### Modules
-So far there modules for: Port Scanning, Web App Enumeration, & SMB Enumeration.
+So far there are modules for: Port Scanning, Web App Enumeration, & SMB Enumeration.
 
 In subsequent versions, each of these will be expanded upon, and more modules will be added.
 
