@@ -5,6 +5,8 @@ Well then this is the tool suite for you!
 
 The goal is to speed up a Pentester's reconnaissance, and prevent them from forgetting certain steps.
 
+Argus should help you see more than a mythical giant with 100 eyes...or some other *arbitrary* example.
+
 ## Functionality
 Argus is a collection of scripts which perform different kinds of enumeration for Penetration Testing.
 
@@ -22,10 +24,11 @@ In subsequent versions, each of these will be expanded upon, and more modules wi
 ## Setup
 After installing the dependencies, give `argus.sh` permission to execute & create a symbolic link in your PATH.
 
-For example, run the following in this Repo's directory.
+For example, run the following in this Repo's directory:
 
 `chmod +x argus.sh`
-`ln -s $(pwd)/argus.sh /home/user/.local/bin/argus'
+
+`ln -s $(pwd)/argus.sh /home/user/.local/bin/argus`
 
 ### Dependencies
 nmap
