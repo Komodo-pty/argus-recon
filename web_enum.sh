@@ -68,5 +68,5 @@ read ports
 		echo -e $line
 	done
 	echo -e "\n[+] Manually perform Subdomain Enumeration for each Web App!\n"
-	echo -e "\nAdd IP to /etc/hosts if necessary. May need to filter content to exclude results from wildcard DNS resulotion (e.g. -fw 30. Use a command like:\n"
+	echo -e "\nAdd IP to /etc/hosts if necessary. May need to filter content to exclude results from wildcard DNS resulotion (e.g. -fw 3). Use a command like:\n"
 	echo 'ffuf -c -u http://example.com:8080 -H "Host: FUZZ.example.com" -w /usr/share/seclists/Discovery/DNS/shubs-subdomains.txt'
