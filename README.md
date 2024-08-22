@@ -5,7 +5,7 @@ Well then this is the tool suite for you!
 
 The goal is to speed up a Pentester's reconnaissance, and prevent them from forgetting certain steps.
 
-Argus should help you see more than a mythical giant with 100 eyes...or some other *arbitrary* example.
+Argus will help you see more than a mythical giant with 100 eyes...or some other *arbitrary* example.
 
 ## Functionality
 Argus is a collection of scripts which perform different kinds of enumeration for Penetration Testing.
@@ -14,7 +14,7 @@ Each of these scripts can be run independently, or they can be launched from the
 
 For the most part, this is a series of wrappers which utilize common Pentesting tools; why reinvent the wheel?
 
-Argus will also perform a few extra tricks, so I can impress user's with its elegance.
+Argus also performs a few extra tricks, so I can impress users with its elegance.
 
 ### Modules
 So far there modules for: Port Scanning, Web App Enumeration, & SMB Enumeration.
