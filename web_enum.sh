@@ -52,19 +52,19 @@ read ports
 	do
 		for w in $lists
 		do
-			ffuf -c -u "http://$ip:$p/FUZZ" -ic -w $w $ext $proxy | tee -a "$ip:$p"_ffuf.txt
+			ffuf -c -u "http://$ip:$p/FUZZ" -ic -w $w $ext $proxy | tee -a "$ip"_"$p"_ffuf.txt
 			echo -e $line
 		done
 
-		cewl "http://$ip:$p" --with-numbers -e -d 4 | grep -v CeWL >> /dev/shm/"$ip:$p"_CeWL.txt
+		cewl "http://$ip:$p" --with-numbers -e -d 4 | grep -v CeWL >> /dev/shm/"$ip"_"$p"_CeWL.txt
 
 #Create lowercase duplicate of the wordlist, merge the lists, & remove any duplicate entries
 
-		duplicut -c /dev/shm/"$ip:$p"_CeWL.txt -o /dev/shm/"$ip:$p"_lower_CeWL.txt
-		cat /dev/shm/"$ip:$p"_lower_CeWL.txt >> /dev/shm/"$ip:$p"_CeWL.txt
-		duplicut /dev/shm/"$ip:$p"_CeWL.txt -o "$ip:$p"_CeWL.txt
+		duplicut -c /dev/shm/"$ip"_"$p"_CeWL.txt -o /dev/shm/"$ip"_"$p"_lower_CeWL.txt
+		cat /dev/shm/"$ip"_"$p"_lower_CeWL.txt >> /dev/shm/"$ip"_"$p"_CeWL.txt
+		duplicut /dev/shm/"$ip"_"$p"_CeWL.txt -o "$ip"_"$p"_CeWL.txt
 
-		ffuf -c -u "http://$ip:$p/FUZZ" -w "$ip:$p"_CeWL.txt $ext $proxy | tee -a "$ip:$p"_ffuf.txt
+		ffuf -c -u "http://$ip:$p/FUZZ" -w "$ip"_"$p"_CeWL.txt $ext $proxy | tee -a "$ip"_"$p"_ffuf.txt
 		echo -e $line
 	done
 	echo -e "\n[+] Manually perform Subdomain Enumeration for each Web App!\n"
