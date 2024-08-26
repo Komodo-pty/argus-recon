@@ -5,7 +5,7 @@ Well then this is the tool suite for you!
 
 The goal is to speed up a Pentester's reconnaissance, and prevent them from forgetting certain steps.
 
-Argus will help you see more than a mythical giant with 100 eyes...or some other *arbitrary* example.
+Argus will help you see more than its namesake.
 
 ## Functionality
 Argus is a collection of scripts which perform different kinds of enumeration for Penetration Testing.
