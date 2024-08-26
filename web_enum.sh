@@ -46,12 +46,7 @@ do
 
 	result=$(python3 $path/web_scraper.py)
 
-	echo -e "\nLinks found:\n"
-	output=$(for i in $result; do echo $i; done)
-	echo "${output[@]}" | sort | uniq	
-
-#Need to sort before uniq.
-#Misses things outside webroot & some links may not end in /
+	echo "${result[@]}" | sort | uniq
 
 	echo -e $line
 
