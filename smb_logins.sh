@@ -127,13 +127,9 @@ then
 		read out2
 
 
-		if [ "$cred" == "y" ]
-		then
-			echo $lUsers | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}' >> "$out1"
-			echo $dUsers | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}' >> "$out2"
-		else
-			echo $lUsers | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}' >> "$out1"
-			echo $dUsers | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}' >> "$out2"
-		fi
+		echo $lUsers | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}' >> "$out1"
+		echo $dUsers | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}' >> "$out2"
+
+
 	fi
 fi
