@@ -3,7 +3,7 @@
 path=$(readlink $(which argus) | awk -F 'argus.sh' '{print $1}')
 while true;
 do
-	echo -e "\nSelect an operation:\n[0] Exit\n[1] Port Scan\n[2] Web App\n[3] SMB\n"
+	echo -e "\nSelect an operation:\n[0] Exit\n[1] Port Scan\n[2] Web App\n[3] SMB\n[4] Kerberos"
 	read mode
 
 	if [ $mode == 0 ]
@@ -21,6 +21,10 @@ do
 	elif [ $mode == 3 ]
 	then
 		source $path/smb_logins.sh
+
+	elif [ $mode == 4 ]
+	then
+		source $path/krb_enum.sh
 
 	else
 		echo -e "\nYou did not select a valid option\n"

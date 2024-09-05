@@ -9,6 +9,7 @@ path=$(readlink $(which argus) | awk -F 'argus.sh' '{print $1}')
 #Add option to run as is in interactive mode OR 1) set all args @ start 2) supply args for main script that are passed to this?
 #Output is grouped for each type of Enum. Instead group results by each target? There'd only need to be 1 for loop for ports
 #Add output file option & set name var for each test. If out=yes make file based off of name var's value
+#Consider ffuf -timeout so you can move onto the next target if one isnt responding
 
 echo -e "\nEnter target IP / hostname:"
 read ip
@@ -42,7 +43,7 @@ do
                 	site="http://$ip:$p/$webroot"
         	fi
 
-	echo -e "\nLinks on webpage: $site\n\nLook for Domain Names\n"
+	echo -e "\nLinks on webpage: $site\n\nLook for Domain Names\n[!] Tip: Manually review Source Code to ensure nothing was missed\n"
 	
 	export site
 
