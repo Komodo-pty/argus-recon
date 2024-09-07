@@ -1,14 +1,10 @@
 #!/bin/bash
 
 line="\n============================================================\n"
-proxy=""
-ext=""
-webroot=""
 path=$(readlink $(which argus) | awk -F 'argus.sh' '{print $1}')
 
 #Add option to run as is in interactive mode OR 1) set all args @ start 2) supply args for main script that are passed to this?
-#Output is grouped for each type of Enum. Instead group results by each target? There'd only need to be 1 for loop for ports
-#Add output file option & set name var for each test. If out=yes make file based off of name var's value
+#Add output file option & set name var for each test. If out=yes make file based off of name var's value. Collect output with '| tee -a ...'
 #Consider ffuf -timeout so you can move onto the next target if one isnt responding
 
 echo -e "\nEnter target IP / hostname:"
@@ -18,83 +14,94 @@ echo -e $line
 echo -e "\nEnter space seperated list of Web App ports (e.g. 80 8080)\n"
 read ports
 
-echo -e "\nWill you be using the default webroot base path? (e.g. http://site.com/) [Y/n]\n"
-read choice
-
-if [ $choice == "n" ]
-then
-	echo -e "\nInput the Subdirectory name to use. (e.g. wordpress)\n"
-	read webroot
-fi
-
-for p in $ports
-do
-	echo -e "\nFingerprinting: http://$ip:$p/$webroot\n"
-	whatweb -a 3 -v --user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "http://$ip:$p/$webroot"
-	echo -e $line
-done
-
-for p in $ports
-do
-	if [ -z "$webroot" ]
-        	then
-                	site="http://$ip:$p"
-        	else
-                	site="http://$ip:$p/$webroot"
-        	fi
-
-	echo -e "\nLinks on webpage: $site\n\nLook for Domain Names\n[!] Tip: Manually review Source Code to ensure nothing was missed\n"
-	
-	export site
-
-	result=$(python3 $path/web_scraper.py)
-
-	echo "${result[@]}" | sort | uniq
-
-	echo -e $line
-
-done
-
-#ffuf is having issues when supplied with comma seperated wordlists, so iterate through wordlists with for loop instead
-echo -e "\nEnter space seperated list of wordlist paths for Subdirectory Enumeration\n"
-read lists
-
 echo -e "\nAre you using burpsuite or ZAP? [y/N]\n"
 read choice
 
 if [ $choice == "y" ]
 then
 	proxy="-replay-proxy http://localhost:8080"
+else
+	proxy=""
 fi
-echo -e "\nDo you want to use extensions for Subdirectory Enumeration? [y/N]\n"
-read choice
-
-if [ $choice == "y" ]
-then
-	echo -e "\nEnter comma seperated list of extensions for ffuf (e.g. .php,.bak)\n"
-	read choice
-	ext="-e $choice"
-fi
-
-echo -e $line
-
-
 
 for p in $ports
 do
+	echo -e "$line\nBeginning tests on $ip:$p\n$line"
+	echo -e "\nWill you be using the default webroot base path? (e.g. http://site.com/) [Y/n]\n"
+	read choice
 
-#Check if a webroot was specified. This ensures there's no extra / which can help ffuf
-
-	if [ -z "$webroot" ]
+	if [ $choice == "n" ]
 	then
-		site="http://$ip:$p"
+		echo -e "\nInput the Subdirectory name to use. (e.g. wordpress)\n"
+		read webroot
+		echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
+		read protocol
+
+		if [ $protocol == 1 ]
+		then
+			site="http://$ip:$p/$webroot"
+		elif [ $protocol == 2 ]
+		then
+			site="https://$ip:$p/$webroot"
+		else
+			echo -e "\nYou did not select a valid option\n"
+			exit
+		fi
 	else
-		site="http://$ip:$p/$webroot"
+		echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
+		read protocol
+
+		if [ $protocol == 1 ]
+		then
+			site="http://$ip:$p"
+		elif [ $protocol == 2 ]
+		then
+			site="https://$ip:$p"
+		else
+			echo -e "\nYou did not select a valid option\n"
+			exit
+		fi
 	fi
+#Fingerprinting
+	echo -e "\nFingerprinting: $site\n"
+	whatweb -a 3 -v --user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site"
+	echo -e $line
+
+#Scraping Links
+	echo -e "\nLinks on webpage: $site\n\nLook for Domain Names\n[!] Tip: Manually review Source Code to ensure nothing was missed\n"
+	
+	export site
+
+	result=$(python3 $path/web_scraper.py)
+	echo "${result[@]}" | sort | uniq
+
+#	 curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" http://$ip:$p/$webroot | grep '://'| awk -F '://' '{print $2}' | awk -F '/' '{print $1}' | sort | uniq
+
+	echo -e $line
+
+#Subdirectory Enumeration
+
+#ffuf is having issues when supplied with comma seperated wordlists, so iterate through wordlists with for loop instead
+	echo -e "\nEnter space seperated list of wordlist paths for Subdirectory Enumeration\n"
+	read lists
+
+	echo -e "\nDo you want to use extensions for Subdirectory Enumeration? [y/N]\n"
+	read choice
+
+	if [ $choice == "y" ]
+	then
+		echo -e "\nEnter comma seperated list of extensions for ffuf (e.g. .php,.bak)\n"
+		read choice
+		ext="-e $choice"
+	else
+		ext=""
+	fi
+
+	echo -e $line
 
 	for w in $lists
 	do
-		ffuf -c -u "$site/FUZZ" -w $w $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy | tee -a "$ip"_"$p"_ffuf.txt
+		ffuf -c -u "$site/FUZZ" -w $w $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
 		echo -e $line
 	done
 
@@ -106,11 +113,9 @@ do
 	cat /dev/shm/"$ip"_"$p"_lower_CeWL.txt >> /dev/shm/"$ip"_"$p"_CeWL.txt
 	duplicut /dev/shm/"$ip"_"$p"_CeWL.txt -o "$ip"_"$p"_CeWL.txt
 
-	ffuf -c -u "$site/FUZZ" -w "$ip"_"$p"_CeWL.txt $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy | tee -a "$ip"_"$p"_ffuf.txt
+	ffuf -c -u "$site/FUZZ" -w "$ip"_"$p"_CeWL.txt $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
 	echo -e $line
 done
-
-
 
 echo -e "\n[+] Manually perform Subdomain Enumeration for each Web App!\n"
 echo -e "\nAdd IP to /etc/hosts if necessary. May need to filter content to exclude results from wildcard DNS resulotion (e.g. -fw 3). Use a command like:\n"
