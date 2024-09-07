@@ -105,13 +105,13 @@ do
 		echo -e $line
 	done
 
-	cewl --with-numbers -e -d 4 -u "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site/" | grep -v CeWL >> /dev/shm/"$ip"_"$p"_CeWL.txt
+	cewl --with-numbers -e -d 4 -u "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site/" | grep -v CeWL >> /dev/shm/"$ip"_"$p"_basic_CeWL.txt
 
 #Create lowercase duplicate of the wordlist, merge the lists, & remove any duplicate entries
 
-	duplicut -c /dev/shm/"$ip"_"$p"_CeWL.txt -o /dev/shm/"$ip"_"$p"_lower_CeWL.txt
-	cat /dev/shm/"$ip"_"$p"_lower_CeWL.txt >> /dev/shm/"$ip"_"$p"_CeWL.txt
-	duplicut /dev/shm/"$ip"_"$p"_CeWL.txt -o "$ip"_"$p"_CeWL.txt
+	duplicut -c /dev/shm/"$ip"_"$p"_basic_CeWL.txt -o /dev/shm/"$ip"_"$p"_lower_CeWL.txt
+	cat /dev/shm/"$ip"_"$p"_lower_CeWL.txt >> /dev/shm/"$ip"_"$p"_basic_CeWL.txt
+	duplicut /dev/shm/"$ip"_"$p"_basic_CeWL.txt -o "$ip"_"$p"_CeWL.txt
 
 	ffuf -c -u "$site/FUZZ" -w "$ip"_"$p"_CeWL.txt $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
 	echo -e $line
