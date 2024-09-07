@@ -53,3 +53,10 @@ Ensure all aforementioned dependencies are in your PATH and are named appropriat
 Depending on how it was installed, Impacket's lookupsid may have another name (e.g. impacket-lookupsid).
 
 netexec should have the alias nxc.
+
+# Related Projects
+Check out the rest of the Pentesting Pantheon:
+
+Prepare your next attack with Ares (https://github.com/Komodo-pty/ares-attack)
+
+Hunt for shells with Artemis (https://github.com/Komodo-pty/artemis-hunter)
