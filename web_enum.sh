@@ -68,7 +68,7 @@ do
 	echo -e $line
 
 #Scraping Links
-	echo -e "\nLinks on webpage: $site\n\nLook for Domain Names\n[!] Tip: Manually review Source Code to ensure nothing was missed\n"
+	echo -e "\nLinks on webpage: $site\n\nLook for Domain Names & interesting filenames\n[!] Tip: Manually review Source Code to ensure nothing was missed\n"
 	
 	export site
 
