@@ -17,7 +17,7 @@ For the most part, this is a series of wrappers which utilize common Pentesting 
 Argus also performs a few extra tricks, so I can impress users with its elegance.
 
 ### Modules
-So far there are modules for: Port Scanning, Web App Enumeration, SMB Enumeration, & Kerberos Enumeration.
+So far there are modules for: Port Scanning, Web App Enumeration, SMB Enumeration, Kerberos Enumeration, & DNS Enumeration.
 
 In subsequent versions, each of these will be expanded upon, and more modules will be added.
 
@@ -46,6 +46,8 @@ netexec
 lookupsid.py
 
 kerbrute
+
+dig
 
 #### Note
 Ensure all aforementioned dependencies are in your PATH and are named appropriately.
