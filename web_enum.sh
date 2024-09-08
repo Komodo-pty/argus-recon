@@ -45,7 +45,7 @@ do
 			site="https://$ip:$p/$webroot"
 		else
 			echo -e "\nYou did not select a valid option\n"
-			exit
+			return
 		fi
 	else
 		echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
@@ -59,7 +59,7 @@ do
 			site="https://$ip:$p"
 		else
 			echo -e "\nYou did not select a valid option\n"
-			exit
+			return
 		fi
 	fi
 #Fingerprinting
