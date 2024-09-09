@@ -49,6 +49,8 @@ kerbrute
 
 dig
 
+smbmap
+
 #### Note
 Ensure all aforementioned dependencies are in your PATH and are named appropriately.
 
