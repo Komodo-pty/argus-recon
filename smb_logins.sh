@@ -4,28 +4,30 @@ line="\n============================================================\n"
 echo -e "\nEnter the target IP / hostname:"
 read target
 
-echo -e "\nSelect an operation:\n[1] Test default logins\n[2] Enumerate users via Read access to IPC$\n"
+echo -e "\nSelect an operation:\n[1] Test default logins\n[2] Enumerate users via Read access to IPC$\n[3] List contents & permissions for all shares\n"
 read mode
 
-query=$(nxc smb $target -u '' -p '')
-domain=$(echo "$query" | grep domain | awk -F 'domain:' '{print $2}' | awk -F ')' '{print $1}')
-host=$(echo "$query" | awk -F 'name:' '{print $2}' | awk -F ')' '{print $1}')
-dom="\n[+] Using Domain: $domain\n"
-hostname="\n[+] Using Hostname: $host\n"
-ad=0
-
-if [ "$host" == "$domain" ]
+if [ $mode == 1 ] || [ $mode == 2 ]
 then
-	echo -e "\nThe Hostname is identical to the Domain Name\n"
+	query=$(nxc smb $target -u '' -p '')
+	domain=$(echo "$query" | grep domain | awk -F 'domain:' '{print $2}' | awk -F ')' '{print $1}')
+	host=$(echo "$query" | awk -F 'name:' '{print $2}' | awk -F ')' '{print $1}')
+	dom="\n[+] Using Domain: $domain\n"
+	hostname="\n[+] Using Hostname: $host\n"
+	ad=0
 
-elif [ "$domain" == "" ]
-then
-	echo -e "\nNo Domain Name detected\n"
+	if [ "$host" == "$domain" ]
+	then
+		echo -e "\nThe Hostname is identical to the Domain Name\n"
 
-else
-	ad=1
+	elif [ "$domain" == "" ]
+	then
+		echo -e "\nNo Domain Name detected\n"
+
+	else
+		ad=1
+	fi
 fi
-
 echo -e "$line"
 
 if [ $mode == 1 ]
@@ -182,6 +184,31 @@ then
 	else
 		echo -e "\nYou did not select a valid option\n"
 	fi
+
+elif [ $mode == 3 ]
+then
+	echo -e "\nEnter the Domain name or Hostname to use:\n"
+	read dom
+	echo -e "\nEnter the Username to use:\n"
+	read user
+#	username="'"
+#	username+=$user
+#	username+="'"
+
+	echo -e "\n\n[!] Tip: You can authenticate with a password, or with LMHASH:NTHASH (to use hashes, you must specify both seperated with a colon as shown)\n"
+	echo -e "\nEnter the password or the hashes:\n"
+	read cred
+#	passwd="'"
+#	passwd+=$cred
+#	passwd+="'"
+
+#	set -x
+	smbmap -H $target -u $user -p $cred -d $dom -r 
+#	echo $username
+#	echo $passwd
+#	smbmap -H $target -u $username -p $passwd -d $dom
+#	set +x
+
 else
 	echo -e "\nYou did not select a valid option\n"
 fi
