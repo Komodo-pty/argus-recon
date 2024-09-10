@@ -20,7 +20,7 @@ do
 
 	elif [ $mode == 3 ]
 	then
-		source "$path"smb_logins.sh
+		source "$path"smb_enum.sh
 
 	elif [ $mode == 4 ]
 	then

