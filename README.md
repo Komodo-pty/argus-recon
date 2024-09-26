@@ -1,9 +1,5 @@
 # argus-recon
-Too lazy to keep typing the same recon commands, or to write a simple shell script to run them for you?
-
-Well then this is the tool suite for you!
-
-The goal is to speed up a Pentester's reconnaissance, and prevent them from forgetting certain steps.
+The goal of Argus is to speed up a Pentester's reconnaissance, and prevent them from forgetting to perform certain steps.
 
 Argus will help you see more than its namesake.
 
