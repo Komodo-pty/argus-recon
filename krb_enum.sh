@@ -4,7 +4,8 @@ line="\n============================================================\n"
 
 echo -e "$line\nSelect the operation to perform:\n[1] bruteuser - Bruteforce a single user's password from a wordlist"
 echo -e "[2] credpairs - Read username:password combos from a file\n[3] passwordspray - Test a single password against a list of users"
-echo -e "[4] userenum - Enumerate valid domain usernames via Kerberos\n[5] bruteforce - Bruteforce usenames & passwords\n\n[!] Tip: Kerbrute can lockout accounts if that setting is enabled\n"
+echo -e "[4] userenum - Enumerate valid domain usernames via Kerberos\n[5] bruteforce - Bruteforce usenames & passwords (VERIFY IT WORKS!)"
+echo -e "\n\n[!] Tip: Kerbrute can lockout accounts if that setting is enabled\n"
 read mode
 
 echo -e "\nSpecify the domain (e.g. xample.local):\n"
@@ -49,6 +50,8 @@ elif [ $mode == 4 ]
 then
 	echo -e "\nSpecify the file path to the username wordlist:\n"
 	read user
+
+	echo -e "$line\n[!] Tip: kerbrute performs ASREP Roasting on vuln accounts, but the hash *isn't* in a crackable format for john. ASREP Roast with Ares instead.\n$line"
 
 	set -x
 	kerbrute userenum -d $dom --dc $dc "$user"

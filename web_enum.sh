@@ -90,7 +90,7 @@ do
 
 	if [ $choice == "y" ]
 	then
-		echo -e "\nEnter comma seperated list of extensions for ffuf (e.g. .php,.bak)\n"
+		echo -e "\nEnter comma seperated list of extensions for ffuf (e.g. .php,.bak,.html,.txt,.old)\n"
 		read choice
 		ext="-e $choice"
 	else
