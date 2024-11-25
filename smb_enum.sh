@@ -108,37 +108,37 @@ then
 		if [ $cred == 1 ]
 		then
 			echo -e "\n[Local SIDs]\n"
-			lUsers=$(impacket-lookupsid "$user":"$pass"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
+			lUsers=$(lookupsid.py "$user":"$pass"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			echo -e "$line"
 		
 			if  [ $ad -eq 1 ]
 			then
 				echo -e "\n[Domain SIDs]\n"
-				dUsers=$(impacket-lookupsid -domain-sids "$user":"$pass"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
+				dUsers=$(lookupsid.py -domain-sids "$user":"$pass"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			fi
 
 		elif [ $cred == 2 ]
 		then
 			echo -e "\n[Local SIDs]\n"
-                        lUsers=$(impacket-lookupsid -hashes :$ntlm "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
+                        lUsers=$(lookupsid.py -hashes :$ntlm "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
                         echo -e "$line"
                 
                         if  [ $ad -eq 1 ]
                         then
                                 echo -e "\n[Domain SIDs]\n"
-                                dUsers=$(impacket-lookupsid -domain-sids -hashes :$ntlm "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
+                                dUsers=$(lookupsid.py -domain-sids -hashes :$ntlm "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
                         fi
 
 		elif [ $cred == 3 ]
 		then
 			echo -e "\n[Local SIDs]\n"
-			lUsers=$(impacket-lookupsid -no-pass "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
+			lUsers=$(lookupsid.py -no-pass "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			echo -e "$line"
 
 			if [ $ad -eq 1 ]
 			then
 				echo -e "\n[Domain SIDs]\n"
-				dUsers=$(impacket-lookupsid -no-pass -domain-sids "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
+				dUsers=$(lookupsid.py -no-pass -domain-sids "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			fi
 		fi
 	
@@ -201,7 +201,7 @@ then
 # May want to specify domain with -w ?
 #	echo -e "\nEnter the Domain name or Hostname to use:\n"
 #        read dom
-        echo -e "\nEnter the Username to use:\n"
+        echo -e "\n[!] Tip: If Null Sessions are supported, just enter a blank username & password\n\nEnter the Username to use:\n"
         read user
 
 	echo -e "\nHow do you want to authenticate?\n[1] Password\n[2] NTLM Hash\n"
@@ -213,14 +213,14 @@ then
 		echo -e "Enter the Password:\n"
                 read pass 
 		
-		enum4linux-ng -u "$user" -p "$pass" -A "$target"
+		enum4linux-ng -u "$user" -p "$pass" -R -d -A "$target"
 
 	elif [ $cred == 2 ]
 	then
 		echo -e "\nEnter the NTLM hash:\n"
                 read ntlm
 
-		enum4linux-ng -u "$user" -H "$ntlm" -A "$target"
+		enum4linux-ng -u "$user" -H "$ntlm" -R -d -A "$target"
 
 	else
 		echo -e "\nYou did not select a valid option\n"
