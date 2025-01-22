@@ -27,41 +27,55 @@ fi
 for p in $ports
 do
 	echo -e "$line\nBeginning tests on $ip:$p\n$line"
-	echo -e "\nWill you be using the default webroot base path? (e.g. http://site.com/) [Y/n]\n"
-	read choice
 
-	if [ $choice == "n" ]
-	then
-		echo -e "\nInput the Subdirectory name to use. (e.g. wordpress)\n"
-		read webroot
-		echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
-		read protocol
+	while :
+	do	
+		echo -e "\nWill you be using the default webroot base path? (e.g. http://site.com/) [Y/n]\n"
+		read choice
 
-		if [ $protocol == 1 ]
+		if [ "$choice" == "n" ]
 		then
-			site="http://$ip:$p/$webroot"
-		elif [ $protocol == 2 ]
+			echo -e "\nInput the Subdirectory name to use. (e.g. wordpress)\n"
+			read webroot
+			echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
+			read protocol
+
+			if [ "$protocol" == 1 ]
+			then
+				site="http://$ip:$p/$webroot"
+				break
+			elif [ "$protocol" == 2 ]
+			then
+				site="https://$ip:$p/$webroot"
+				break
+			else
+				echo -e "\nYou did not select a valid option\n"
+				continue
+			fi
+		elif [ "$choice" == "y" ] || [ -z "$choice" ]
 		then
-			site="https://$ip:$p/$webroot"
+
+			echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
+			read protocol
+
+			if [ "$protocol" == 1 ]
+			then
+				site="http://$ip:$p"
+				break
+
+			elif [ "$protocol" == 2 ]
+			then
+				site="https://$ip:$p"
+				break
+			else
+				echo -e "\nYou did not select a valid option\n"
+				continue
+			fi
 		else
 			echo -e "\nYou did not select a valid option\n"
-			return
+			continue
 		fi
-	else
-		echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
-		read protocol
-
-		if [ $protocol == 1 ]
-		then
-			site="http://$ip:$p"
-		elif [ $protocol == 2 ]
-		then
-			site="https://$ip:$p"
-		else
-			echo -e "\nYou did not select a valid option\n"
-			return
-		fi
-	fi
+	done
 #Fingerprinting
 	echo -e "\nFingerprinting: $site\n"
 	whatweb -a 3 -v --user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site"
@@ -73,7 +87,20 @@ do
 	export site
 
 	result=$(python3 $path/web_scraper.py)
-	echo "${result[@]}" | sort | uniq
+	scrape=$(echo "${result[@]}" | sort | uniq)
+	echo "$scrape"
+
+	if [ "$proxy" != "" ]
+	then
+		echo -e "\nPopulating Burpsuite's sitemap with URLs found (Ensure that you setup Burp's scope)\n"
+
+		for i in $(echo $scrape)
+		do
+			curl -s "$site"/"$i" -x http://localhost:8080 > /dev/null
+		done
+	else
+		echo -e "\nManually check each of the links that are in your scope\n"
+	fi
 
 #	 curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" http://$ip:$p/$webroot | grep '://'| awk -F '://' '{print $2}' | awk -F '/' '{print $1}' | sort | uniq
 
