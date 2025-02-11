@@ -94,9 +94,29 @@ do
 	then
 		echo -e "\nPopulating Burpsuite's sitemap with URLs found (Ensure that you setup Burp's scope)\n"
 
-		for i in $(echo $scrape)
-		do
-			curl -s "$site"/"$i" -x http://localhost:8080 > /dev/null
+#		for i in $(echo $scrape)
+#		do
+#			curl -s "$site"/"$i" -x http://localhost:8080 > /dev/null
+#		done
+
+		for i in $scrape; do
+
+			# Check if the link is a full URL
+			if [[ "$i" =~ ^https?:// ]]; then
+			
+				url="$i"  # It's a full URL
+			
+			elif [[ "$i" =~ ^/ ]]; then
+				url="$site$i"  # It's an absolute path (starts with /), so prepend the base site URL
+			else
+				# It's a relative path without leading /, so append it to the current base URL
+				
+				url="$site/$i"
+			fi
+			
+			# Use curl to send the request
+
+			curl -s "$url" -x http://localhost:8080 > /dev/null
 		done
 	else
 		echo -e "\nManually check each of the links that are in your scope\n"
