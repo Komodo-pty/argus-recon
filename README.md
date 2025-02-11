@@ -62,3 +62,5 @@ Check out the rest of the Pentesting Pantheon:
 Prepare your next attack with Ares (https://github.com/Komodo-pty/ares-attack)
 
 Hunt for shells with Artemis (https://github.com/Komodo-pty/artemis-hunter)
+
+Perform Post-Exploitation enumeration against Windows hosts with Hades (https://github.com/Komodo-pty/hades-PrivEsc)
