@@ -21,8 +21,8 @@ done
 
 if [ "$opt" == "1" ]
 then
-	tcp_out="| tee ${target}_TCP.nmap"
-	udp_out="| tee ${target}_Top_UDP.nmap"
+	tcp_out="-oN ${target}_TCP.nmap"
+	udp_out="-oN ${target}_Top_UDP.nmap"
 else
 	tcp_out=""
 	udp_out=""
@@ -40,7 +40,7 @@ elif [ $scan == 2 ]
 then
 	echo -e "\nTCP SYN Scan: All ports & default scripts used\n\n[!] Tip: Consider TCP Connect Scan for OSCP\n"
 	echo -e "[!] Tip: Even if Nmap's output says 'Not shown: 1000 open|filtered udp ports (no-response)', there could be UDP Ports in use (i.e. SNMP on 161)\n"
-	sudo nmap -p- -T"$timing" -sVC -Pn -vv $target $tcp_out
+	sudo nmap -p- -T"$timing" -sVC -O -Pn -vv $target $tcp_out
 else
 	echo -e "\nYou did not select a valid option\n"
 	return
