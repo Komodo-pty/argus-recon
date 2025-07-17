@@ -1,8 +1,23 @@
 #!/bin/bash
 
 line="\n============================================================\n"
-echo -e "\nEnter target IP / hostname:\n"
-read target
+target=""
+
+while getopts ":i:" option; do
+	case $option in
+		i)
+			target="$OPTARG"
+			;;
+	esac
+done
+
+if [[ -z "$target" ]];
+then
+	echo -e "\nEnter target IP / hostname:\n"
+	read target
+fi
+
+
 echo -e "\nSave Scan Output to file?\n[1] Yes\n[2] No\n"
 read opt
 
@@ -13,7 +28,7 @@ do
 
 	if [[ "$timing" == "1" || "$timing" == "2" || "$timing" == "3" || "$timing" == "4" || "$timing" == "5" ]]
 	then
-		break  # Valid input; exit loop
+		break 
 	else
 		echo "Invalid input. Please enter a number from 1 to 5."
 	fi

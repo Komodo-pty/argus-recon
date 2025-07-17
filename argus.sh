@@ -1,36 +1,116 @@
 #!/bin/bash
 
 path=$(readlink $(which argus) | awk -F 'argus.sh' '{print $1}')
-while true;
-do
-	echo -e "\nSelect an operation:\n[0] Exit\n[1] Port Scan\n[2] Web App\n[3] SMB\n[4] Kerberos\n[5] DNS"
+line="\n============================================================\n"
+target=""
+
+Help()
+{
+cat << EOF
+
+Argus will interactively prompt you for input unless you provide the necessary arguments for the selected module.
+	
+[Options]
+	-h: Show this help message
+	-i <IP / HOSTNAME>: Enter the target's IP Address
+	-m <MODULE>: Specify the module you want to use
+
+[Modules]
+	scan: TCP & UDP port scan
+	web: Web App recon
+	smb: SMB recon
+	krb: Kerberos recon
+	dns: DNS recon
+
+EOF
+}
+	
+if [ $# -eq 0 ]
+then
+        echo -e "$line\nNo arguments provided. Defaulting to interactive mode.\n\n[!] Tip: Use the -h argument to view the help menu\n"
+else
+	while getopts ":hi:m:" option; do
+		case $option in
+			h)
+                        	Help
+                                exit;;
+
+			i)
+				target=$OPTARG;;
+
+			m)
+				mode=$OPTARG;;
+		
+			\?)
+                                echo -e "\nError: Invalid argument"
+                                exit;;
+                esac
+	done
+fi
+
+if [[ -z "$mode" ]]
+then
+	echo -e "\nSelect an operation:\n[1] Port Scan\n[2] Web App\n[3] SMB\n[4] Kerberos\n[5] DNS\n"
 	read mode
+fi
 
-	if [ $mode == 0 ]
-	then
-		break
+case "$mode" in
+	scan|1)
+		echo -e "$line\n[Port Scan]"
 
-	elif [ $mode == 1 ]
-	then
-		source "$path"port_scan.sh
+		if [[ -n "$target" ]];
+		then
+			bash "$path"port_scan.sh -i "$target"
+		else
+			bash "$path"port_scan.sh
+		fi
+		;;
 
-	elif [ $mode == 2 ]
-	then
-		source "$path"web_enum.sh
+	web|2)
+		echo -e "$line\n[Web App]"
 
-	elif [ $mode == 3 ]
-	then
-		source "$path"smb_enum.sh
+		if [[ -n "$target" ]];
+		then
+			bash "$path"web_enum.sh -i "$target"
+		else
+			bash "$path"web_enum.sh
+		fi
+		;;
 
-	elif [ $mode == 4 ]
-	then
-		source "$path"krb_enum.sh
-	elif [ $mode == 5 ]
-	then
-		source "$path"dns_enum.sh
+	smb|3)
+		echo -e "$line\n[SMB]"
 
-	else
+		if [[ -n "$target" ]];
+		then
+			bash "$path"smb_enum.sh -i "$target"
+		else
+			bash "$path"smb_enum.sh
+		fi
+		;;
+
+	krb|4)
+		echo -e "$line\n[Kerberos]"
+
+		if [[ -n "$target" ]];
+		then
+			bash "$path"krb_enum.sh -i "$target"
+		else
+			bash "$path"krb_enum.sh
+		fi
+		;;
+
+	dns|5)
+		echo -e "$line\n[DNS]"
+
+		if [[ -n "$target" ]];
+		then
+			bash "$path"dns_enum.sh -i "$target"
+		else
+			bash "$path"dns_enum.sh
+		fi
+		;;
+
+	*)
 		echo -e "\nYou did not select a valid option\n"
-	fi
-
-done
+		;;
+esac
