@@ -1,14 +1,28 @@
 #!/bin/bash
 
 line="\n============================================================\n"
-echo -e "\nEnter the target IP / hostname:"
-read target
+target=""
+
+while getopts ":i:" option; do
+	case $option in
+		i)
+			target="$OPTARG"
+			;;
+	esac
+done
+
+if [[ -z "$target" ]];
+then
+	echo -e "\nEnter target IP / hostname:\n"
+	read target
+fi
 
 echo -e "\nSelect an operation:\n[1] Test default logins\n[2] Enumerate users via Read access to IPC$\n[3] List contents & permissions for all shares"
 echo -e "[4] Enumerate Server Info (e.g. Get Account Descriptions)\n"
+
 read mode
 
-if [ $mode == 1 ] || [ $mode == 2 ]
+if (( mode == 1 || mode == 2 ))
 then
 	query=$(nxc smb $target -u '' -p '')
 	domain=$(echo "$query" | grep domain | awk -F 'domain:' '{print $2}' | awk -F ')' '{print $1}')
@@ -31,7 +45,7 @@ then
 fi
 echo -e "$line"
 
-if [ $mode == 1 ]
+if (( mode == 1 ))
 then
 	echo -e "$hostname"
 
@@ -51,7 +65,7 @@ then
 	nxc smb "$target" -u 'guest' -p '' -d "$host" --shares
 	echo -e "$line"
 
-	if [ $ad -eq 1 ]
+	if (( ad == 1 ))
 	then
 		echo -e "$dom"
 
@@ -71,12 +85,12 @@ then
 		nxc smb "$target" -u 'guest' -p '' -d "$domain" --shares
 		echo -e "$line"
 	fi
-elif [ $mode == 2 ]
+elif (( mode == 2 ))
 then
 	echo -e "\nDo you want to extract usernames & save them to a file?\n[1] No. Print results to STDOUT\n[2] Yes. Print results & then write usernames to a file\n"
 	read opt
 
-	if [ "$opt" == "1" ] || [ "$opt" == "2" ]
+	if (( opt == 1 || opt == 2 ))
 	then
 		echo -e "\nEnter the Username to use (Use Syntax DOMAIN/USER or HOSTNAME/USER):\n"
 		read user
@@ -84,17 +98,17 @@ then
 		echo -e "\nSelect an option:\n[1] Authenticate using a password\n[2] Authenticate using an NTLM hash\n[3] Use an account that doesn't have a password\n"
 		read cred
 
-		if [ $cred == 1 ]
+		if (( cred == 1 ))
 		then
 			echo -e "\nEnter the Password:\n"
 			read pass
 
-		elif [ $cred == 2 ]
+		elif (( cred == 2 ))
 		then
 			echo -e "\nEnter the NTLM hash:\n"
 			read ntlm
 
-		elif [ $cred == 3 ]
+		elif (( cred == 3 ))
 		then
 			echo -e "\nConnecting using an account with a Null password\n"
 		else
@@ -103,46 +117,46 @@ then
 		fi
 	fi
 
-	if [ "$opt" == "1" ] || [ "$opt" == "2" ]
+	if (( opt == 1 || opt == 2 ))
 	then
-		if [ $cred == 1 ]
+		if (( cred == 1 ))
 		then
 			echo -e "\n[Local SIDs]\n"
 			lUsers=$(lookupsid.py "$user":"$pass"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			echo -e "$line"
 		
-			if  [ $ad -eq 1 ]
+			if  (( ad == 1 ))
 			then
 				echo -e "\n[Domain SIDs]\n"
 				dUsers=$(lookupsid.py -domain-sids "$user":"$pass"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			fi
 
-		elif [ $cred == 2 ]
+		elif (( cred == 2 ))
 		then
 			echo -e "\n[Local SIDs]\n"
                         lUsers=$(lookupsid.py -hashes :$ntlm "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
                         echo -e "$line"
                 
-                        if  [ $ad -eq 1 ]
+			if  (( ad == 1 ))
                         then
                                 echo -e "\n[Domain SIDs]\n"
                                 dUsers=$(lookupsid.py -domain-sids -hashes :$ntlm "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
                         fi
 
-		elif [ $cred == 3 ]
+		elif (( cred == 3 ))
 		then
 			echo -e "\n[Local SIDs]\n"
 			lUsers=$(lookupsid.py -no-pass "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			echo -e "$line"
 
-			if [ $ad -eq 1 ]
+			if (( ad == 1 ))
 			then
 				echo -e "\n[Domain SIDs]\n"
 				dUsers=$(lookupsid.py -no-pass -domain-sids "$user"@"$target" | tee /dev/tty | grep  "SidTypeUser" | awk -F '\' '{print $2}' | awk -F ' \\(' '{print $1}')
 			fi
 		fi
 	
-		if [ "$opt" == "2" ]
+		if (( opt == 2 ))
 		then
 			echo -e "\nLocal Users: Path to output file\n"
 			read out1
@@ -180,7 +194,7 @@ then
 		echo -e "\nYou did not select a valid option\n"
 	fi
 
-elif [ $mode == 3 ]
+elif (( mode == 3 ))
 then
 	echo -e "\nEnter the Domain name or Hostname to use:\n"
 	read dom
@@ -191,11 +205,11 @@ then
 	echo -e "\nEnter the password or the hashes:\n"
 	read cred
 
-	set -x
+#	set -x
 	smbmap -H $target -u "$user" -p "$cred" -d $dom -r
-	set +x
+#	set +x
 
-elif [ $mode == 4 ]
+elif (( $mode == 4 ))
 then
 
 # May want to specify domain with -w ?
@@ -207,7 +221,7 @@ then
 	echo -e "\nHow do you want to authenticate?\n[1] Password\n[2] NTLM Hash\n"
 	read cred
 
-	if [ $cred == 1 ]
+	if (( cred == 1 ))
 	then
 
 		echo -e "Enter the Password:\n"
@@ -215,7 +229,7 @@ then
 		
 		enum4linux-ng -u "$user" -p "$pass" -R -d -A "$target"
 
-	elif [ $cred == 2 ]
+	elif (( cred == 2 ))
 	then
 		echo -e "\nEnter the NTLM hash:\n"
                 read ntlm

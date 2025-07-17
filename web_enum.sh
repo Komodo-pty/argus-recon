@@ -3,13 +3,24 @@
 line="\n============================================================\n"
 path=$(readlink $(which argus) | awk -F 'argus.sh' '{print $1}')
 
-#Add option to run as is in interactive mode OR 1) set all args @ start 2) supply args for main script that are passed to this?
 #Add output file option & set name var for each test. If out=yes make file based off of name var's value. Collect output with '| tee -a ...'
 #Consider ffuf -timeout so you can move onto the next target if one isnt responding
 
-echo -e "\nEnter target IP / hostname:"
-read ip
-echo -e $line
+target=""
+
+while getopts ":i:" option; do
+	case $option in
+		i)
+			target="$OPTARG"
+			;;
+	esac
+done
+
+if [[ -z "$target" ]];
+then
+	echo -e "\nEnter target IP / hostname:\n"
+	read target
+fi
 
 echo -e "\nEnter space seperated list of Web App ports (e.g. 80 8080)\n"
 read ports
@@ -26,7 +37,7 @@ fi
 
 for p in $ports
 do
-	echo -e "$line\nBeginning tests on $ip:$p\n$line"
+	echo -e "$line\nBeginning tests on $target:$p\n$line"
 
 	while :
 	do	
@@ -42,11 +53,11 @@ do
 
 			if [ "$protocol" == 1 ]
 			then
-				site="http://$ip:$p/$webroot"
+				site="http://$target:$p/$webroot"
 				break
 			elif [ "$protocol" == 2 ]
 			then
-				site="https://$ip:$p/$webroot"
+				site="https://$target:$p/$webroot"
 				break
 			else
 				echo -e "\nYou did not select a valid option\n"
@@ -60,12 +71,12 @@ do
 
 			if [ "$protocol" == 1 ]
 			then
-				site="http://$ip:$p"
+				site="http://$target:$p"
 				break
 
 			elif [ "$protocol" == 2 ]
 			then
-				site="https://$ip:$p"
+				site="https://$target:$p"
 				break
 			else
 				echo -e "\nYou did not select a valid option\n"
@@ -122,7 +133,7 @@ do
 		echo -e "\nManually check each of the links that are in your scope\n"
 	fi
 
-#	 curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" http://$ip:$p/$webroot | grep '://'| awk -F '://' '{print $2}' | awk -F '/' '{print $1}' | sort | uniq
+#	 curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" http://$target:$p/$webroot | grep '://'| awk -F '://' '{print $2}' | awk -F '/' '{print $1}' | sort | uniq
 
 	echo -e $line
 
@@ -152,15 +163,15 @@ do
 		echo -e $line
 	done
 
-	cewl --with-numbers -e -d 4 -u "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site/" | grep -v CeWL >> /dev/shm/"$ip"_"$p"_basic_CeWL.txt
+	cewl --with-numbers -e -d 4 -u "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site/" | grep -v CeWL >> /dev/shm/"$target"_"$p"_basic_CeWL.txt
 
 #Create lowercase duplicate of the wordlist, merge the lists, & remove any duplicate entries
 
-	duplicut -c /dev/shm/"$ip"_"$p"_basic_CeWL.txt -o /dev/shm/"$ip"_"$p"_lower_CeWL.txt
-	cat /dev/shm/"$ip"_"$p"_lower_CeWL.txt >> /dev/shm/"$ip"_"$p"_basic_CeWL.txt
-	duplicut /dev/shm/"$ip"_"$p"_basic_CeWL.txt -o "$ip"_"$p"_CeWL.txt
+	duplicut -c /dev/shm/"$target"_"$p"_basic_CeWL.txt -o /dev/shm/"$target"_"$p"_lower_CeWL.txt
+	cat /dev/shm/"$target"_"$p"_lower_CeWL.txt >> /dev/shm/"$target"_"$p"_basic_CeWL.txt
+	duplicut /dev/shm/"$target"_"$p"_basic_CeWL.txt -o "$target"_"$p"_CeWL.txt
 
-	ffuf -c -u "$site/FUZZ" -w "$ip"_"$p"_CeWL.txt $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
+	ffuf -c -u "$site/FUZZ" -w "$target"_"$p"_CeWL.txt $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
 	echo -e $line
 done
 
