@@ -102,6 +102,8 @@ case "$mode" in
 	dns|5)
 		echo -e "$line\n[DNS]"
 
+#Placeholder if statement which is currently useless. I'll change the arguments for the DNS script soon.
+
 		if [[ -n "$target" ]];
 		then
 			bash "$path"dns_enum.sh -i "$target"
