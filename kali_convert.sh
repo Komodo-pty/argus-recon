@@ -1,15 +1,45 @@
 #!/bin/bash
+cat <<EOF
 
-echo -e "What format do you want the impacket dependencies?\n"
-echo -e "[1] Kali (impacket-lookupsid)\n[2] Standalone installation (lookupsid.py)\n"
+What format do you want the impacket dependencies?
+
+[1] Create Symlinks for Kali (e.g. impacket-lookupsid)
+
+[2] Create Symlinks for standalone installation (e.g. lookupsid.py)
+
+EOF
+
 read choice
 
-if [ $choice == 1 ]
+depends=( "lookupsid" )
+
+if (( choice == 1 ))
 then
-	sed -i 's/lookupsid.py/impacket-lookupsid/g' smb_enum.sh
-elif [ $choice == 2 ]
+  for i in "${depends[@]}"; do 
+    src=$(which impacket-$i 2>/dev/null)
+    dest="$HOME/.local/bin/$i.py"
+
+    if [[ -x "$src" ]]; then
+      ln -s "$src" "$dest"
+      echo "Linked $src -> $dest"
+    else
+      echo "impacket-$i not found in PATH"
+    fi
+  done
+
+elif (( choice == 2 ))
 then
-	sed -i 's/impacket-lookupsid/lookupsid.py/g' smb_enum.sh
+  for i in "${depends[@]}"; do
+    src=$(which $i.py 2>/dev/null)
+    dest="$HOME/.local/bin/impacket-$i"
+    if [[ -x "$src" ]]; then
+      ln -s "$src" "$dest"
+      echo "Linked $src -> $dest"
+    else
+      echo "$i.py not found in PATH"
+    fi
+  done
+
 else
-	echo "Invalid selection. When prompted, enter either 1 or 2"
+  echo "Invalid selection. When prompted, enter a either 1 or 2"
 fi

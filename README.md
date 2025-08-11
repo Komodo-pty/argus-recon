@@ -54,7 +54,7 @@ netexec should have the alias nxc.
 
 Depending on how they are installed, the name of Impacket's tools can vary (e.g. impacket-lookupsid vs lookupsid.py).
 
-You can convert the tool names to either format by running `kali_convert.sh`
+You can create the symlinks for the Impacket tools in either format by running `kali_convert.sh`
 
 # Related Projects
 Check out the rest of the Pentesting Pantheon:
