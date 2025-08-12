@@ -11,16 +11,10 @@ Run `argus -h  for the main help menu, or specify a module to get its help menu 
 ### Modules
 So far there are modules for: Port Scanning, Web App Enumeration, SMB Enumeration, Kerberos Enumeration, & DNS Enumeration.
 
-In subsequent versions, each of these will be expanded upon, and more modules will be added.
-
 ## Setup
-After installing the dependencies, give `argus.sh` permission to execute & create a symbolic link in your PATH.
+After installing the dependencies, navigate to this Repo's directory & run `setup.sh`. 
 
-For example, run the following in this Repo's directory:
-
-`chmod +x argus.sh`
-
-`ln -s $(pwd)/argus.sh /home/user/.local/bin/argus`
+`bash ./setup.sh`
 
 ### Dependencies
 nmap
@@ -35,7 +29,7 @@ duplicut
 
 netexec
 
-lookupsid.py
+impacket-lookupsid
 
 kerbrute
 
@@ -50,7 +44,7 @@ netexec should have the alias nxc.
 
 Depending on how they are installed, the name of Impacket's tools can vary (e.g. impacket-lookupsid vs lookupsid.py).
 
-You can create the symlinks for the Impacket tools in either format by running `kali_convert.sh`
+You can convert the tool names to the proper format by running `setup.sh`
 
 # Related Projects
 Check out the rest of the Pentesting Pantheon:
