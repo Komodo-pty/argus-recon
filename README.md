@@ -1,16 +1,12 @@
 # argus-recon
-The goal of Argus is to speed up a Pentester's reconnaissance, and prevent them from forgetting to perform certain steps.
-
-Argus will help you see more than its namesake.
+The goal of Argus is to automate several types of Pentesting enumeration.
 
 ## Functionality
 Argus is a collection of scripts which perform different kinds of enumeration for Penetration Testing.
 
 Each of these scripts can be run independently, or they can be launched from the main `argus.sh` script.
 
-For the most part, this is a series of wrappers which utilize common Pentesting tools; why reinvent the wheel?
-
-Argus also performs a few extra tricks, so I can impress users with its elegance.
+Run `argus -h  for the main help menu, or specify a module to get its help menu (e.g. `argus -m scan -h`)
 
 ### Modules
 So far there are modules for: Port Scanning, Web App Enumeration, SMB Enumeration, Kerberos Enumeration, & DNS Enumeration.
