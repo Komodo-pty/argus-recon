@@ -10,6 +10,7 @@ target=""
 ports=""
 lists=""
 ext=""
+user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1"
 
 Help()
 {
@@ -17,15 +18,16 @@ Help()
 [Options]
 	-h: Display this help menu
 	-i <IP_ADDRESS>: The target's IP Address
-	-p <PORTS>: Comma seperated list of ports
+	-p <PORT[:tls][:url:WEBROOT]>: Comma seperated list of ports. HTTP is used unless ":tls" is specified. Optionally specify ":url:PATH" (e.g. 80:url:wordpress for /wordpress/)
 	-w <WORDLISTS>: Comma seperated file paths to wordlists for subdirectory enumeration
 	-e <EXTENSIONS>: Comma seperated file extensions to test (e.g. .php,.bak,.html,.txt,.old)
+	-u <USER_AGENT>: Specify value for the User-Agent HTTP Header (between quotes)
 EOF
 exit 0
 }
 
 
-while getopts ":hi:p:w:e:" option; do
+while getopts ":hi:p:w:e:u:" option; do
   case $option in
     h)
       Help
@@ -44,6 +46,9 @@ while getopts ":hi:p:w:e:" option; do
     e)
       ext="-e $OPTARG"
       ;;
+    u)
+      user_agent="$OPTARG"
+      ;;
   esac
 done
 
@@ -54,7 +59,12 @@ then
 fi
 
 if [[ -z "$ports" ]]; then
-  echo -e "\nEnter space seperated list of Web App ports (e.g. 80 8080)\n"
+  cat <<EOF
+Enter space seperated list of Web App ports
+
+HTTP is used unless ":tls" is specified. Optionally specify subdirectory with ":url:PATH" (e.g. 80:url:wordpress for /wordpress/)
+
+EOF
   read -ra port_array
 fi
 
@@ -67,52 +77,41 @@ then
 else
 	proxy=""
 fi
+###
 
-for p in "${port_array[@]}"; do
-  echo -e "$line\n[Testing $target:$p]\n$line"
-  while :; do	
-    echo -e "\nWill you be using the default webroot base path? (e.g. http://site.com/) [Y/n]\n"
-    read choice
+for entry in "${port_array[@]}"; do
+  protocol="http"
+  webroot=""
 
-    if [ "$choice" == "n" ]; then
-      echo -e "\nInput the Subdirectory name to use. (e.g. wordpress)\n"
-      read webroot
-      echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
-      read protocol
+  # Check if the entry contains `:tls` or `:https` to set protocol
+  if [[ "$entry" == *":tls" || "$entry" == *":https" ]]; then
+    port=$(echo "$entry" | cut -d':' -f1)
+    protocol="https"
 
-      if [ "$protocol" == 1 ]; then
-        site="http://$target:$p/$webroot"
-        break
-      elif [ "$protocol" == 2 ]; then
-        site="https://$target:$p/$webroot"
-        break
-      else
-        echo -e "\nYou did not select a valid option\n"
-        continue
-      fi
-    elif [ "$choice" == "y" ] || [ -z "$choice" ]; then
-      echo -e "\nSelect a protocol to use:\n[1] HTTP\n[2] HTTPS\n"
-      read protocol
-
-        if [ "$protocol" == 1 ]; then
-          site="http://$target:$p"
-          break
-
-        elif [ "$protocol" == 2 ]; then
-          site="https://$target:$p"
-          break
-        else
-          echo -e "\nYou did not select a valid option\n"
-          continue
-        fi
-    else
-      echo -e "\nYou did not select a valid option\n"
-      continue
+    # Check if there's a webroot specified after :url:
+    if [[ "$entry" == *":url:"* ]]; then
+      webroot=$(echo "$entry" | cut -d':' -f4)  # Extract webroot after :url:
     fi
-  done
+  else
+    # Handle case for default HTTP protocol or user-specified webroot
+    if [[ "$entry" == *":url:"* ]]; then
+      port=$(echo "$entry" | cut -d':' -f1)
+      webroot=$(echo "$entry" | cut -d':' -f3)  # Extract webroot after :url:
+    else
+      port="$entry"  # Just a port, default to HTTP
+      protocol="http"
+    fi
+  fi
+
+  site="$protocol://$target:$port"
+  if [[ -n "$webroot" ]]; then
+    site="$site/$webroot"
+  fi
+  echo -e "$line\n[Testing $site]\n$line"
+
 #Fingerprinting
   echo -e "\nFingerprinting: $site\n"
-  whatweb -a 3 -v --user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site"
+  whatweb -a 3 -v --user-agent "$user_agent" "$site"
   echo -e $line
 
 #Scraping Links
@@ -169,11 +168,11 @@ for p in "${port_array[@]}"; do
   echo -e $line
 
   for w in "${list_array[@]}"; do
-    ffuf -c -u "$site/FUZZ" -w "$w" $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
+    ffuf -c -u "$site/FUZZ" -w "$w" $ext -H "User-Agent: $user_agent" $proxy 
     echo -e $line
   done
 
-  cewl --with-numbers -e -d 4 -u "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" "$site/" | grep -v CeWL >> /dev/shm/"$target"_"$p"_basic_CeWL.txt
+  cewl --with-numbers -e -d 4 -u "$user_agent" "$site/" | grep -v CeWL >> /dev/shm/"$target"_"$p"_basic_CeWL.txt
 
 #Create lowercase duplicate of the wordlist, merge the lists, & remove any duplicate entries
 
@@ -181,7 +180,7 @@ for p in "${port_array[@]}"; do
   cat /dev/shm/"$target"_"$p"_lower_CeWL.txt >> /dev/shm/"$target"_"$p"_basic_CeWL.txt
   duplicut /dev/shm/"$target"_"$p"_basic_CeWL.txt -o "$target"_"$p"_CeWL.txt
 
-  ffuf -c -u "$site/FUZZ" -w "$target"_"$p"_CeWL.txt $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
+  ffuf -c -u "$site/FUZZ" -w "$target"_"$p"_CeWL.txt $ext -H "User-Agent: $user_agent" $proxy 
   echo -e $line
 done
 
