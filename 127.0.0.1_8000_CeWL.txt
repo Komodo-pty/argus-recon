@@ -1,4 +1,0 @@
-Error: spider gem not installed
-    Run 'bundle install' to install all the required gems
-error: spider gem not installed
-    run 'bundle install' to install all the required gems
