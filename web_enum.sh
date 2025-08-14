@@ -39,7 +39,7 @@ while getopts ":hi:p:w:e:" option; do
       ;;
     w)
       lists="$OPTARG"
-      IFS=',' read -ra list_aray <<< "$lists"
+      IFS=',' read -ra list_array <<< "$lists"
       ;;
     e)
       ext="-e $OPTARG"
@@ -55,7 +55,7 @@ fi
 
 if [[ -z "$ports" ]]; then
   echo -e "\nEnter space seperated list of Web App ports (e.g. 80 8080)\n"
-  read port_array
+  read -ra port_array
 fi
 
 echo -e "\nAre you using burpsuite or ZAP? [y/N]\n"
@@ -152,7 +152,7 @@ for p in "${port_array[@]}"; do
 #ffuf is having issues when supplied with comma seperated wordlists, so iterate through wordlists with for loop instead
   if [[ -z "$lists" ]]; then
     echo -e "\nEnter space seperated list of wordlist paths for Subdirectory Enumeration\n"
-    read list_array
+    read -ra list_array
   fi
 
   if [[ -z "$ext" ]]; then
@@ -169,7 +169,7 @@ for p in "${port_array[@]}"; do
   echo -e $line
 
   for w in "${list_array[@]}"; do
-    ffuf -c -u "$site/FUZZ" -w $w $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
+    ffuf -c -u "$site/FUZZ" -w "$w" $ext -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.1" $proxy 
     echo -e $line
   done
 
