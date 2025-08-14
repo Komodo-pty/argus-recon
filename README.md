@@ -6,7 +6,7 @@ Argus is a collection of scripts which perform different kinds of enumeration fo
 
 Each of these scripts can be run independently, or they can be launched from the main `argus.sh` script.
 
-Run `argus -h  for the main help menu, or specify a module to get its help menu (e.g. `argus -m scan -h`)
+Run `argus -h`  for the main help menu, or specify a module to get its help menu (e.g. `argus -m scan -h`)
 
 ### Modules
 So far there are modules for: Port Scanning, Web App Enumeration, SMB Enumeration, Kerberos Enumeration, & DNS Enumeration.
