@@ -12,6 +12,10 @@ cat <<EOF
 	-s <DNS_SERVER>: The DNS Server's IP Address
 
 [!] Tip: This queries a DNS Server, but it isn't a replacement for other DNS Enumeration techniques (e.g. fuzzing subdomains with ffuf)
+
+[Usage]
+	argus -m dns -i host01 -s 12.34.567.890
+
 EOF
 exit 0
 }

@@ -19,6 +19,9 @@ cat <<EOF
 	shares: List contents & permissions for all shares
 	enum: Enumerate server info (e.g. account descriptions)
 
+[Usage]
+	argus -m smb -i 127.0.0.1 -x users
+
 EOF
 exit 0
 }

@@ -26,6 +26,10 @@ Help()
 
 	[+] Example: "-sT" is equivilent to "-s con"
 
+[Usage]
+	argus -m scan -i 10.201.109.255 -sS -T 3
+	argus -m scan -i 10.201.109.255 -s syn -T 4 -o
+
 EOF
 exit 0
 }

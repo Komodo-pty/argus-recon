@@ -31,7 +31,10 @@ cat <<EOF
 	enum: (userenum) Enumerate valid domain usernames via Kerberos
 	bf: (bruteforce) Bruteforce usenames & passwords
 
-[!] Tip: Kerbrute can lockout accounts depending on target's configuration
+[!] Tip: Password attacks may lockout accounts depending on target's configuration
+
+[Usage]
+	argus -m krb -x spray -i 127.0.0.1 -d xample.local -p 'passwrd123!' -U ./users.txt
 EOF
 exit 0
 }
