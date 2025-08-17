@@ -24,7 +24,7 @@ Help()
 	-u <USER_AGENT>: Specify value for the User-Agent HTTP Header (between quotes)
 
 [Usage]
-	argus -m web -i 127.0.0.1 -p 443:tls:wordpress,8000 -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -e .php,.bak,.html,.txt,.old
+	argus -m web -i 127.0.0.1 -p 443:tls:url:wordpress,8000 -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -e .php,.bak,.html,.txt,.old
 EOF
 exit 0
 }
