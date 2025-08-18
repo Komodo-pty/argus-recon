@@ -212,7 +212,7 @@ EOF
     else
       echo -e "\nYou did not select a valid option\n"
     fi
-
+    ;;
   shares|3)
     echo -e "\nEnter the Domain name or Hostname to use:\n"
     read dom
@@ -223,7 +223,7 @@ EOF
     echo -e "\nEnter the password or the hashes:\n"
     read cred
     smbmap -H $target -u "$user" -p "$cred" -d $dom -r
-
+    ;;
   enum|4)
 # May want to specify domain with -w ?
 #	echo -e "\nEnter the Domain name or Hostname to use:\n"
@@ -250,7 +250,7 @@ EOF
       echo -e "\nYou did not select a valid option\n"
       return
     fi
-        
+    ;;   
   *)
     echo -e "\nYou did not select a valid option\n"
     Help
