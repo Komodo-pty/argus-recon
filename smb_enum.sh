@@ -27,7 +27,7 @@ exit 0
 }
 
 while getopts ":hi:x:" option; do
-  case $option in
+  case "$option" in
     h)
       Help
       ;;

@@ -20,7 +20,7 @@ EOF
 exit 0
 }
 
-while getops ":hi:s:" option; do
+while getopts ":hi:s:" option; do
   case "$option" in
     h)
       Help
@@ -46,12 +46,12 @@ fi
 
 echo -e "$line\n[Basic DNS Queries]\n$line\nLookup any records:\n"
 
-dig any $hostname @$server
+dig any "$hostname" @"$server"
 
 echo -e "$line\nLookup additional DNS Server info:\n"
 
-dig all $hostname @$server
+dig all "$hostname" @"$server"
 
 echo -e "$line\n[AXFR]\n$line\n[!] Tip: If the output shows 'Transfer failed' it means that this type of query isn't supported by the DNS Server\n\nAttempting Zone Transfer:\n"
 
-dig axfr $hostname @$server
+dig axfr "$hostname" @"$server"
