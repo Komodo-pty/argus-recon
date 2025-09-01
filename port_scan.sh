@@ -34,9 +34,8 @@ EOF
 exit 0
 }
 
-while getopts ":hi:os:T:" option
-do
-  case $option in
+while getopts "hi:os:T:" option; do
+  case "$option" in
     h)
       Help
       ;;
