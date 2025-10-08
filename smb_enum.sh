@@ -214,7 +214,7 @@ EOF
     fi
     ;;
   shares|3)
-    echo -e "\nEnter the Domain name or Hostname to use:\n"
+    echo -e "\nEnter the Domain or Hostname to use (example.local):\n"
     read dom
     echo -e "\nEnter the Username to use:\n"
     read user
@@ -254,4 +254,5 @@ EOF
   *)
     echo -e "\nYou did not select a valid option\n"
     Help
+    ;;
 esac

@@ -10,6 +10,7 @@ Argus performs automated enumeration for several services.
 - [SMB](#smb)
 - [Kerberos](#kerberos)
 - [DNS](#dns)
+- [LDAP](#ldap)
 
 ## Setup
 After installing the dependencies, navigate to this Repo's directory & run `setup.sh`. 
@@ -38,6 +39,8 @@ kerbrute
 dig
 
 smbmap
+
+ldapsearch
 
 ## Functionality
 ```
@@ -148,8 +151,31 @@ Perform various port scans.
 	-s <DNS_SERVER>: The DNS Server's IP Address
 
 [Usage]
-        argus -m dns -i host01 -s 12.34.567.890
+    argus -m dns -i host01 -s 12.34.567.890
 
+```
+
+### LDAP
+```
+[Options]
+    -h: Display this help menu
+    -i <IP_ADDRESS>: The target's IP Address
+	-d <DOMAIN>: The target's domain (e.g. xample.local)
+	-u <USERNAME>: Specify a username
+    -p <PASSWORD>: Specify a password
+	-x <MODE>: Specify the operation to perform
+	-o <OUTFILE>: Save output to specified file
+
+[Modes]
+	enum: Basic enumeration
+	user: Enumerate users
+	host: Enumerate hosts
+
+[!] Tip: You usually need to authenticate for user & host enumeration
+
+[Usage]
+	argus -m ldap -x user -i 12.34.56.789 -d example.local -u bob -p 'passwd123!' -o user_list.txt
+	argus -m ldap -x enum -i 12.34.56.789
 ```
 ## Related Projects
 Check out the rest of the Pentesting Pantheon:

@@ -25,6 +25,7 @@ Argus will interactively prompt you for input unless you provide the necessary a
 	smb: SMB recon
 	krb: Kerberos recon
 	dns: DNS recon
+	ldap: LDAP recon
 
 EOF
 exit 0
@@ -79,6 +80,7 @@ Select a Module
 	[3] SMB
 	[4] Kerberos
 	[5] DNS
+	[6] LDAP
 EOF
   read mode
 fi
@@ -107,6 +109,11 @@ case "$mode" in
   dns|5)
     echo -e "$line\n[DNS]\n"
     bash "$path"dns_enum.sh "${module_args[@]}"
+    ;;
+
+  ldap|6)
+    echo -e "$line\n[LDAP]\n"
+    bash "$path"ldap_enum.sh "${module_args[@]}"
     ;;
 
   *)
