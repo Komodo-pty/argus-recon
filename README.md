@@ -160,11 +160,11 @@ Perform various port scans.
 [Options]
     -h: Display this help menu
     -i <IP_ADDRESS>: The target's IP Address
-	-d <DOMAIN>: The target's domain (e.g. xample.local)
+	-d <DOMAIN>: The target's domain (e.g., xample.local). If no domain is provided, it'll be automatically detected
 	-u <USERNAME>: Specify a username
     -p <PASSWORD>: Specify a password
 	-x <MODE>: Specify the operation to perform
-	-o <OUTFILE>: Save output to specified file
+	-o <OUTFILE>: Save output to specified file, extracting usernames & hosts
 
 [Modes]
 	enum: Basic enumeration

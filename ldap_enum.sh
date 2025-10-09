@@ -13,11 +13,11 @@ Help()
 [Options]
         -h: Display this help menu
         -i <IP_ADDRESS>: The target's IP Address
-	-d <DOMAIN>: The target's domain (e.g. xample.local)
+	-d <DOMAIN>: The target's domain (e.g., xample.local). If no domain is provided, it'll be automatically detected
 	-u <USERNAME>: Specify a username
         -p <PASSWORD>: Specify a password
 	-x <MODE>: Specify the operation to perform
-	-o <OUTFILE>: Save output to specified file
+	-o <OUTFILE>: Save output to specified file, extracting usernames & hosts
 
 [Modes]
 	enum: Basic enumeration
@@ -87,17 +87,18 @@ fi
 
 if [[ "$mode" != "enum" && "$mode" != "1" ]]; then
   if [[ -z "$root" ]]; then
-    root=$(Enum | grep "rootDomainNamingContext:" | awk -F 'rootDomainNamingContext: ' '{print $2}')
+    echo -e "$line\nDomain not provided. Attempting to automatically retrieve it.\n"
+    root=$(Enum | tee /dev/tty | grep "rootDomainNamingContext:" | awk -F 'rootDomainNamingContext: ' '{print $2}')
+    echo -e "$line" 
   fi
 
   if [[ -z "$username" || -z "$passwd" ]]; then
-    echo -e "\nAttempting anonymous connection. Credentials are usually required for this action.\n"
+    echo -e "\nAttempting anonymous connection. Credentials are usually required for this action.\n$line"
     creds="false"
   else
     dn="CN=$username,CN=Users,$root"
     creds="true"
   fi
-
 fi
 
 case "$mode" in
