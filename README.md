@@ -170,8 +170,9 @@ Perform various port scans.
 	enum: Basic enumeration
 	user: Enumerate users
 	host: Enumerate hosts
+    hound: Remote Bloodhound enumeration against a DC
 
-[!] Tip: You usually need to authenticate for user & host enumeration
+[!] Tip: Credentials are usually required for more detailed methods of enumeration
 
 [Usage]
 	argus -m ldap -x user -i 12.34.56.789 -d example.local -u bob -p 'passwd123!' -o user_list.txt

@@ -2,6 +2,7 @@
 
 line="\n============================================================\n"
 target=""
+domain=""
 root=""
 username=""
 passwd=""
@@ -23,8 +24,9 @@ Help()
 	enum: Basic enumeration
 	user: Enumerate users
 	host: Enumerate hosts
+	hound: Remote Bloodhound enumeration against a DC
 
-[!] Tip: You usually need to authenticate for user & host enumeration
+[!] Tip: Credentials are usually required for more detailed methods of enumeration
 
 [Usage]
 	argus -m ldap -x user -i 12.34.56.789 -d example.local -u bob -p 'passwd123!' -o user_list.txt
@@ -48,9 +50,7 @@ while getopts ":hi:d:u:p:x:o:" option; do
       target="$OPTARG"
       ;;
     d)
-      dom=$(echo -n "$OPTARG" | awk -F '.' '{print $1}')
-      tld=$(echo -n "$OPTARG" | awk -F '.' '{print $2}')
-      root="DC=$dom,DC=$tld"
+      domain="$OPTARG"
       ;;
     u)
       username="$OPTARG"
@@ -74,42 +74,51 @@ fi
 
 if [[ -z "$mode" ]]; then
   cat << EOF
-Select the operation to perform:
+[Modes]
+	enum: Basic enumeration
+	user: Enumerate users
+	host: Enumerate hosts
+	hound: Remote Bloodhound enumeration against a DC
 
-[1] enum: Basic enumeration
-[2] user: Enumerate users
-[3] host: Enumerate hosts
-
-[!] Tip: User & host enum usually requires creds for authentication
+[!] Tip: Credentials are usually required for more detailed methods of enumeration
 EOF
   read mode
 fi
 
-if [[ "$mode" != "enum" && "$mode" != "1" ]]; then
-  if [[ -z "$root" ]]; then
+if [[ "$mode" != "enum" ]]; then
+
+  if [[ -z "$domain" ]]; then
     echo -e "$line\nDomain not provided. Attempting to automatically retrieve it.\n"
     root=$(Enum | tee /dev/tty | grep "rootDomainNamingContext:" | awk -F 'rootDomainNamingContext: ' '{print $2}')
-    echo -e "$line" 
+    echo -e "$line"
+
+    if [[ "$mode" == "hound" ]]; then
+      domain=$(echo -n "$root" | sed -E 's/DC=([^,]+)/\1/g; s/,/./g')
+    fi
   fi
 
   if [[ -z "$username" || -z "$passwd" ]]; then
     echo -e "\nAttempting anonymous connection. Credentials are usually required for this action.\n$line"
     creds="false"
+
+    if [[ "$mode" == "user" || "$mode" == "host" ]]; then
+      dn="CN=$username,CN=Users,$root"
+    fi
+
   else
-    dn="CN=$username,CN=Users,$root"
     creds="true"
   fi
 fi
 
 case "$mode" in
-  enum|1)
+  enum)
     if [[ -n "$outfile" ]]; then
       Enum | tee -a "$outfile"
     else
       Enum
     fi
     ;;
-  user|2)
+  user)
     if [[ "$creds" == "false" ]]; then
       output=$(ldapsearch -H "ldap://$target" -x -b "$root" "(objectClass=user)" sAMAccountName | tee /dev/tty | grep "sAMAccountName" | awk -F 'sAMAccountName: ' '{print $2}')
     elif [[ "$creds" == "true" ]]; then
@@ -122,7 +131,7 @@ case "$mode" in
       done
     fi
     ;;
-  host|3)
+  host)
     if [[ "$creds" == "false" ]]; then
       output=$(ldapsearch -H "ldap://$target" -x -b "$root" "(objectClass=computer)" sAMAccountName | tee /dev/tty | grep "sAMAccountName" | awk -F 'sAMAccountName: ' '{print $2}')
     elif [[ "$creds" == "true" ]]; then
@@ -135,6 +144,15 @@ case "$mode" in
       done
     fi
     ;;
+
+  hound)
+    if [[ "$creds" == "false" ]]; then
+      nxc ldap "$target" -d "$domain" --bloodhound -c All --dns-server "$target"
+    elif [[ "$creds" == "true" ]]; then
+      nxc ldap "$target" -d "$domain" -u "$username" -p "$passwd" --bloodhound -c All --dns-server "$target"
+    fi
+    ;;
+
   *)
     echo -e "\nYou did not select a valid mode\n"
     Help
