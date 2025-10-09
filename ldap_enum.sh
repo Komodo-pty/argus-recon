@@ -58,6 +58,9 @@ while getopts ":hi:d:u:p:x:o:" option; do
     p)
       passwd="$OPTARG"
       ;;
+    x)
+      mode="$OPTARG"
+      ;;
     o)
       outfile="$OPTARG"
       ;;
