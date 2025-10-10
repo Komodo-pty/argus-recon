@@ -101,11 +101,10 @@ if [[ "$mode" != "enum" ]]; then
     echo -e "\nAttempting anonymous connection. Credentials are usually required for this action.\n$line"
     creds="false"
 
+  else
     if [[ "$mode" == "user" || "$mode" == "host" ]]; then
       dn="CN=$username,CN=Users,$root"
     fi
-
-  else
     creds="true"
   fi
 fi
