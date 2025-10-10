@@ -57,6 +57,7 @@ Argus will interactively prompt you for input unless you provide the necessary a
 	smb: SMB recon
 	krb: Kerberos recon
 	dns: DNS recon
+    ldap: LDAP recon
 ```
 
 ### Scanner
